@@ -42,7 +42,7 @@ def getembedding(item: URL):
     dir_data= download(item.url)
     if dir_data: 
         mel_spec= preprocessing(dir_data)
-        embedding= get_embedding(model, mel_spec, rate= 1)
+        embedding= get_embedding(model, mel_spec, rate= item.rate)
         os.remove(dir_data)
         return json.dumps(embedding.tolist())
 
