@@ -2,8 +2,8 @@ import os
 import gdown 
 import requests
 import torch 
-from torch import nn 
 import librosa 
+import json
 import numpy as np 
 from model import AudioClassify_model
 from contant import model_url, num_classes, input_shape
@@ -63,4 +63,22 @@ def download(link):
     else: 
         print('Cannot Install')
         return None
+
+def call_api_get_embedding():
+    url= 'https://0c03-2405-4802-1d7e-2d20-17e1-a685-5a1-4c4f.ngrok-free.app/api/admin/embedding?page=1&limit=10000'
+    response= requests.get(url)
+    if response.status_code == 200: 
+        print('Query all embedding') 
+
+        data= json.loads(response.content)['data']
+        get_musicId = lambda x: x['musicId']
+        get_embedding= lambda x: json.loads(x['embedding'])
+
+        musicIDs= list(map(get_musicId, data))
+        embeddings= list(map(get_embedding, data))
+
+        return musicIDs, embeddings
+    else: 
+        print('Cannot query all embedding')
+        return None, None
 
