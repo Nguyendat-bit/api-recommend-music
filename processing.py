@@ -44,7 +44,7 @@ def get_embedding(model, x, rate= 1):
     x = list(map(standardized, x))
 
     # print(x)
-    x = torch.tensor(x).unsqueeze(1)
+    x = torch.tensor(np.array(x)).unsqueeze(1)
     print(x.shape)
     with torch.no_grad(): 
         output= model(x)

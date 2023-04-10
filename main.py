@@ -61,11 +61,11 @@ def recommend(item: ID):
 
         idx= music_ids.index(item.id_music)
 
-        embedding_normalize= torch.nn.functional.normalize(embeddings, p= 2, dim= 1)
+        # embedding_normalize= torch.nn.functional.normalize(torch.tensor(embeddings), p= 2, dim= 1)
 
-        similarities= cosine_similarity([embedding_normalize[idx]], embedding_normalize)
+        similarities= cosine_similarity([embeddings[idx]], embeddings)
 
-        best_idx= np.argsort(similarities)[0][::-1][:item.num_music]
+        best_idx= np.argsort(similarities)[0][::-1][1:item.num_music + 1]
         
         return [music_ids[i] for i in best_idx]
 
