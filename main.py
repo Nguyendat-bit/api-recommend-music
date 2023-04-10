@@ -1,6 +1,15 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+import nest_asyncio
+from pyngrok import ngrok
+import uvicorn
+
 from pydantic import BaseModel
 import json, os
+
+
+os.environ['KMP_DUPLICATE_LIB_OK']='TRUE'
+
 
 from processing import (
     get_embedding, 
@@ -15,9 +24,18 @@ app = FastAPI(
     title="Recommend API",
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins= ['*'],
+    allow_credentials= True, 
+    allow_methods= ['*'],
+    allow_headers= ['*'],
+)
 
 class URL(BaseModel): 
     url: str
+    rate: float
+
 
 @app.post('/getembedding', tags=['Get Embedding'])
 def getembedding(item: URL):
@@ -28,27 +46,13 @@ def getembedding(item: URL):
         os.remove(dir_data)
         return json.dumps(embedding.tolist())
 
-    else: 
-        return None  
+
+# specify a port
+port = 8000
+ngrok_tunnel = ngrok.connect(port, bind_tls=True)
+
+# where we can visit our fastAPI app
+print('Public URL:', ngrok_tunnel.public_url)
 
 
-
-
-# from typing import Optional
-# from fastapi import FastAPI
-# from pydantic import BaseModel # import class BaseModel của thư viện pydantic
-
-
-# class Item(BaseModel): # kế thừa từ class Basemodel và khai báo các biến
-#     name: str
-#     description: Optional[str] = None
-#     price: float
-#     tax: Optional[float] = None
-
-
-# app = FastAPI()
-
-
-# @app.post("/items/")
-# async def create_item(item: Item): # khai báo dưới dạng parameter
-#     return item
+nest_asyncio.apply()

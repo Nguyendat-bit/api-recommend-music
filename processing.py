@@ -27,7 +27,7 @@ def preprocessing(dir, sr= 44100):
     frame_length= int(sr * 0.3)
     hop_length= int(frame_length * 0.5) 
 
-    signal, sr= librosa.load(dir)
+    signal, sr= librosa.load(dir, sr= sr)
     signal= signal[: sr * 30]
 
     frames = librosa.util.frame(signal, frame_length= frame_length, hop_length= hop_length).T
@@ -41,9 +41,11 @@ def preprocessing(dir, sr= 44100):
 def get_embedding(model, x, rate= 1): 
     standardized= lambda x: (x - x.min()) / (-1 * x.min()) * 2 -1
     
-    x = map(standardized, x)
+    x = list(map(standardized, x))
 
-    x = torch.from_numpy(x)
+    # print(x)
+    x = torch.tensor(x).unsqueeze(1)
+    print(x.shape)
     with torch.no_grad(): 
         output= model(x)
     
@@ -52,12 +54,13 @@ def get_embedding(model, x, rate= 1):
 def download(link):
     response= requests.get(link)
     if response.status_code == 200: 
-        print('Cannot Install')
         filename= os.path.basename(link)
+        print(f'Installing {filename}')
         with open('data/' + filename, 'wb') as f:
             f.write(response.content)
 
         return 'data/' + filename
     else: 
+        print('Cannot Install')
         return None
 
